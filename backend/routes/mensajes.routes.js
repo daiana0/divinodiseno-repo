@@ -6,4 +6,5 @@ router.get("/:productoId/mensajes", mensajesController.getMensajesPorProducto);
 
 router.post("/:productoId/mensajes", mensajesController.crearMensaje);
 
+
 module.exports = router;

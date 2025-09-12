@@ -3,37 +3,48 @@ const { validationResult } = require("express-validator");
 
 // Obtener todos los administradores
 const getAdministradores = async (req, res) => {
-    try {
-        console.log("GET /administradores");
+  try {
+    console.log("GET /administradores");
 
-        const { page = 1, limit = 10, activa = true } = req.query;
-        const offset = (page - 1) * limit;
+    let { page = 1, limit = 10, activa = "true" } = req.query;
+    page = parseInt(page);
+    limit = parseInt(limit);
+    const offset = (page - 1) * limit;
 
-        const administradores = await Administrador.findAndCountAll({
-            where: { activa },
-            limit: parseInt(limit),
-            offset: parseInt(offset),
-            order: [["id", "ASC"]],
-        });
-
-        res.json({
-            success: true,
-            data: administradores.rows,
-            pagination: {
-                currentPage: parseInt(page),
-                totalPages: Math.ceil(administradores.count / limit),
-                totalItems: administradores.count,
-                itemsPerPage: parseInt(limit),
-            },
-        });
-    } catch (err) {
-        console.error("Error en getAdministradores:", err);
-        res.status(500).json({
-            success: false,
-            error: "Error interno del servidor",
-            message: "No se pudieron obtener los administradores",
-        });
+    // Construcción dinámica del filtro
+    let where = {};
+    if (activa === "true") {
+      where.activa = true;
+    } else if (activa === "false") {
+      where.activa = false;
     }
+    // si es "all" => no agregamos condición al where
+
+    const administradores = await Administrador.findAndCountAll({
+      where,
+      limit,
+      offset,
+      order: [["id", "ASC"]],
+    });
+
+    res.json({
+      success: true,
+      data: administradores.rows,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(administradores.count / limit),
+        totalItems: administradores.count,
+        itemsPerPage: limit,
+      },
+    });
+  } catch (err) {
+    console.error("Error en getAdministradores:", err);
+    res.status(500).json({
+      success: false,
+      error: "Error interno del servidor",
+      message: "No se pudieron obtener los administradores",
+    });
+  }
 };
 
 // Obtener un administrador por ID
