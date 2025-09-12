@@ -1,0 +1,137 @@
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+
+const ProductoDetalle = () => {
+  const { id } = useParams();
+  const [producto, setProducto] = useState(null);
+  const [mensajes, setMensajes] = useState([]);
+  const [nuevoMensaje, setNuevoMensaje] = useState("");
+  const [variantes, setVariantes] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get(`http://localhost:3000/api/productos/${id}`)
+      .then((res) => setProducto(res.data.data))
+      .catch((err) => console.error("Error producto", err));
+  }, [id]);
+
+  useEffect(() => {
+    axios
+      .get(`http://localhost:3000/api/productos/${id}/mensajes`)
+      .then((res) => {
+        console.log("Mensajes response:", res.data);
+        setMensajes(res.data.data || []);
+      })
+      .catch((err) => {
+        console.error("Error mensajes", err);
+        setMensajes([]);
+      });
+  }, [id]);
+
+  useEffect(() => {
+    axios
+      .get(`http://localhost:3000/api/variantes/producto/${id}`)
+      .then((res) => {
+        console.log("Variantes response:", res.data);
+        setVariantes(res.data.data || []);
+      })
+      .catch((err) => {
+        console.error("Error en traer variantes", err);
+        setVariantes([]);
+      });
+  }, [id]);
+
+  const enviarMensaje = () => {
+    if (!nuevoMensaje.trim()) return;
+
+    axios
+      .post(`http://localhost:3000/api/productos/${id}/mensajes`, {
+        texto: nuevoMensaje,
+      })
+      .then((res) => {
+        console.log("Mensaje enviado:", res.data);
+        setMensajes([...mensajes, res.data.data]);
+        setNuevoMensaje("");
+      })
+      .catch((err) => console.error("Error enviando mensaje", err));
+  };
+
+  if (!producto) return <p>Cargando producto...</p>;
+
+  return (
+    <Box sx={{ p: 3, backgroundColor: "white" }}>
+      <Typography variant="h4" gutterBottom>
+        {producto.nombre}
+      </Typography>
+      <Typography variant="h6" color="text.secondary">
+        Precio: ${producto.precio.toFixed(2)}
+      </Typography>
+
+      <Box sx={{ mt: 4 }}>
+        <Typography variant="h6">Variantes disponibles:</Typography>
+        {variantes.length === 0 ? (
+          <Typography variant="body2">
+            No hay variantes para este producto.
+          </Typography>
+        ) : (
+          <ul>
+            {variantes.map((variante) => (
+              <li
+                key={variante.id}
+                style={{
+                  color: variante.stock === 0 ? "red" : "black",
+                  fontStyle: variante.stock === 0 ? "italic" : "normal",
+                }}
+              >
+                {variante.nombre} | Precio: ${variante.precio} | Stock:{" "}
+                {variante.stock} unidades
+                {variante.stock === 0 && " (No disponible)"}
+              </li>
+            ))}
+          </ul>
+        )}
+      </Box>
+
+      <Box sx={{ mt: 4 }}>
+        <Typography variant="h6">Mensajes del producto:</Typography>
+        {mensajes.length === 0 ? (
+          <Typography variant="body2">No hay mensajes.</Typography>
+        ) : (
+          mensajes.map((msg, i) => (
+            <Typography key={i} variant="body2" sx={{ my: 1 }}>
+              • {msg.texto}
+            </Typography>
+          ))
+        )}
+      </Box>
+
+      <Box sx={{ mt: 4 }}>
+        <Typography variant="subtitle1">Escribir un nuevo mensaje:</Typography>
+        <TextField
+          value={nuevoMensaje}
+          onChange={(e) => setNuevoMensaje(e.target.value)}
+          fullWidth
+          multiline
+          rows={2}
+          placeholder="Escribe tu mensaje..."
+          sx={{ mt: 1 }}
+        />
+        <Button
+          onClick={enviarMensaje}
+          variant="contained"
+          color="primary"
+          sx={{ mt: 1 }}
+        >
+          Enviar Mensaje
+        </Button>
+      </Box>
+    </Box>
+  );
+};
+
+export default ProductoDetalle;
