@@ -9,26 +9,31 @@ import Box from "@mui/material/Box";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { CuponContext } from "../contexts/Cupon.context";
+
 const ProductCard = ({ producto, votos }) => {
   const { cupon } = useContext(CuponContext);
-
   const navigate = useNavigate();
+
   const tieneOferta = producto.oferta;
-  const tieneDescuento = producto.descuento > 0;
-  let precioFinal = tieneDescuento
-    ? producto.precio - (producto.precio * producto.descuento) / 100
-    : producto.precio;
-  if (cupon && cupon.porcentajeDescuento) {
-    precioFinal =
-      producto.precio - (producto.precio * cupon.porcentajeDescuento) / 100;
-  }
+
+  // 1. Obtenemos los descuentos
+  const descuentoProducto = producto.descuento || 0;
+  const descuentoCupon = cupon?.porcentajeDescuento || 0;
+
+  // 2. Elegimos el mayor
+  const mejorDescuento = Math.max(descuentoProducto, descuentoCupon);
+
+  // 3. Calculamos precio final
+  const precioFinal = producto.precio - (producto.precio * mejorDescuento) / 100;
+
+  // 4. Saber si hay descuento
+  const tieneDescuentoAplicado = mejorDescuento > 0;
 
   return (
     <Card
       onClick={() => navigate(`/producto/${producto.id}`)}
       sx={{
         cursor: "pointer",
-
         width: 300,
         height: 400,
         display: "flex",
@@ -39,7 +44,7 @@ const ProductCard = ({ producto, votos }) => {
         position: "relative",
       }}
     >
-      {/*  Indicador de oferta */}
+      {/* Indicador de oferta */}
       {tieneOferta && (
         <Box
           sx={{
@@ -72,10 +77,12 @@ const ProductCard = ({ producto, votos }) => {
       />
 
       <CardContent sx={{ flexGrow: 1 }}>
-        <Typography variant="h7" noWrap>
+        {/* Nombre del producto */}
+        <Typography variant="subtitle1" noWrap>
           {producto.nombre}
         </Typography>
 
+        {/* Descripción */}
         <Typography
           variant="body2"
           color="text.secondary"
@@ -84,17 +91,13 @@ const ProductCard = ({ producto, votos }) => {
           {producto.descripcion}
         </Typography>
 
-        {/* Precio con y sin descuento */}
-        {tieneDescuento ? (
+        {/* Precio con o sin descuento */}
+        {tieneDescuentoAplicado ? (
           <>
             <Typography
               variant="body2"
               color="text.secondary"
-              sx={{
-                textDecoration: "line-through",
-                fontSize: "14px",
-                mt: 1,
-              }}
+              sx={{ textDecoration: "line-through" }}
             >
               ${producto.precio.toFixed(2)}
             </Typography>
@@ -108,9 +111,10 @@ const ProductCard = ({ producto, votos }) => {
           </Typography>
         )}
 
+        {/* Votos */}
         {votos !== undefined && (
           <Typography variant="h6" fontWeight="bold" sx={{ mt: 1 }}>
-            votos: {votos}
+            Votos: {votos}
           </Typography>
         )}
       </CardContent>
