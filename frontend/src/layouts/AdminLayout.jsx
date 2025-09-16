@@ -14,6 +14,7 @@ import {
   ListItemText,
   Container,
 } from '@mui/material';
+import { LocalOffer as LocalOfferIcon } from '@mui/icons-material';
 import {
   Menu as MenuIcon,
   Dashboard as DashboardIcon,
@@ -32,6 +33,7 @@ const menuItems = [
   { text: 'Productos', icon: <ProductsIcon />, path: '/admin/productos' },
   { text: 'Categorías', icon: <CategoryIcon />, path: '/admin/categorias' },
   { text: 'Administradores', icon: <AdminIcon />, path: '/admin/administradores' },
+  { text: 'Cupones', icon: <LocalOfferIcon />, path: '/admin/cupones' },
 ];
 
 const AdminLayout = () => {

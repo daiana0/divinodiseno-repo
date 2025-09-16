@@ -12,7 +12,7 @@ import Dashboard from "./pages/admin/Dashboard";
 import ProductosAdmin from "./pages/admin/productos/ProductosAdmin";
 import CategoriasAdmin from "./pages/admin/categorias/CategoriasAdmin";
 import AdministradoresAdmin from "./pages/admin/administradores/AdministradoresAdmin";
-
+import CuponesAdmin from "./pages/admin/cupones/CuponesAdmin";
 
 const App = () => {
   return (
@@ -33,6 +33,7 @@ const App = () => {
           <Route path="productos" element={<ProductosAdmin />} />
           <Route path="categorias" element={<CategoriasAdmin />} />
           <Route path="administradores" element={<AdministradoresAdmin />} />
+          <Route path="cupones" element={<CuponesAdmin />} />
         </Route>
       </Routes>
     </ThemeProvider>

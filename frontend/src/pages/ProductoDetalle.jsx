@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import { CuponContext } from "../contexts/Cupon.context";
 
 const ProductoDetalle = () => {
   const { id } = useParams();
@@ -12,6 +13,7 @@ const ProductoDetalle = () => {
   const [mensajes, setMensajes] = useState([]);
   const [nuevoMensaje, setNuevoMensaje] = useState("");
   const [variantes, setVariantes] = useState([]);
+  const { cupon } = useContext(CuponContext); // 👈 agregamos cupon context
 
   useEffect(() => {
     axios
@@ -63,15 +65,40 @@ const ProductoDetalle = () => {
 
   if (!producto) return <p>Cargando producto...</p>;
 
+  // 👇 calculamos descuentos igual que en ProductCard
+  const descuentoProducto = producto.descuento || 0;
+  const descuentoCupon = cupon?.porcentajeDescuento || 0;
+  const mejorDescuento = Math.max(descuentoProducto, descuentoCupon);
+  const precioFinal = producto.precio - (producto.precio * mejorDescuento) / 100;
+  const tieneDescuentoAplicado = mejorDescuento > 0;
+
   return (
     <Box sx={{ p: 3, backgroundColor: "white" }}>
       <Typography variant="h4" gutterBottom>
         {producto.nombre}
       </Typography>
-      <Typography variant="h6" color="text.secondary">
-        Precio: ${producto.precio.toFixed(2)}
-      </Typography>
 
+      {/* 👇 mostramos precio con o sin descuento */}
+      {tieneDescuentoAplicado ? (
+        <>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ textDecoration: "line-through" }}
+          >
+            ${producto.precio.toFixed(2)}
+          </Typography>
+          <Typography variant="h5" color="error" fontWeight="bold">
+            ${precioFinal.toFixed(2)}
+          </Typography>
+        </>
+      ) : (
+        <Typography variant="h5" fontWeight="bold">
+          ${producto.precio.toFixed(2)}
+        </Typography>
+      )}
+
+      {/* Variantes */}
       <Box sx={{ mt: 4 }}>
         <Typography variant="h6">Variantes disponibles:</Typography>
         {variantes.length === 0 ? (
@@ -97,6 +124,7 @@ const ProductoDetalle = () => {
         )}
       </Box>
 
+      {/* Mensajes */}
       <Box sx={{ mt: 4 }}>
         <Typography variant="h6">Mensajes del producto:</Typography>
         {mensajes.length === 0 ? (
@@ -110,6 +138,7 @@ const ProductoDetalle = () => {
         )}
       </Box>
 
+      {/* Formulario mensaje */}
       <Box sx={{ mt: 4 }}>
         <Typography variant="subtitle1">Escribir un nuevo mensaje:</Typography>
         <TextField
