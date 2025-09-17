@@ -6,9 +6,15 @@ import {
   Box,
   Typography,
 } from "@mui/material";
+import { Link } from "react-router-dom";
 import axios from "axios";
 
-const categorias = ["Categorias", "Liquidación", "Docentes", "Alumnos"];
+const menuItems = [
+  { label: "Categorías", path: "/categorias" },
+  { label: "Nosotros", path: "/nosotros" },
+  { label: "Contacto", path: "/contacto" },
+  { label: "Alumnos", path: "/alumnos" }
+];
 
 const FilterBar = () => {
   const [productos, setProductos] = useState([]);
@@ -37,9 +43,16 @@ const FilterBar = () => {
         backgroundColor: "info.main",
       }}
     >
-      {categorias.map((categoria, i) => (
-        <Button key={i} variant="text" color="secondary" sx={{ minWidth: 60 }}>
-          {categoria}
+      {menuItems.map((item, i) => (
+        <Button 
+          key={i} 
+          variant="text" 
+          color="secondary" 
+          sx={{ minWidth: 60 }}
+          component={Link}
+          to={item.path}
+        >
+          {item.label}
         </Button>
       ))}
 

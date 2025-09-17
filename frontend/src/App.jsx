@@ -7,6 +7,8 @@ import Home from "./pages/Home";
 import Categoria from "./pages/Categoria";
 import DetalleCategoria from "./pages/DetalleCategoria";
 import ProductoDetalle from "./pages/ProductoDetalle";
+import Nosotros from "./pages/Nosotros";
+import Contacto from "./pages/Contacto";
 import AdminLayout from "./layouts/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
 import ProductosAdmin from "./pages/admin/productos/ProductosAdmin";
@@ -26,6 +28,9 @@ const App = () => {
         <Route path="/categorias/:id" element={<DetalleCategoria />} />
         <Route path="/producto/:id" element={<ProductoDetalle />} />
         <Route path="/productos/:id" element={<ProductoDetalle />} />
+        <Route path="/nosotros" element={<Nosotros />} />
+        <Route path="/contacto" element={<Contacto />} />
+        
         
         {/* Rutas de administración */}
         <Route path="/admin" element={<AdminLayout />}>

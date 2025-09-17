@@ -97,10 +97,18 @@ const createAdministrador = async (req, res) => {
         }
 
         const { usuario, contrasena, email } = req.body;
+        
+        // Hashear la contraseña si se proporciona
+        let hashedPassword = contrasena;
+        if (contrasena) {
+            const bcrypt = require('bcryptjs');
+            const saltRounds = 10;
+            hashedPassword = await bcrypt.hash(contrasena, saltRounds);
+        }
 
         const nuevoAdministrador = await Administrador.create({
             usuario,
-            contrasena,
+            contrasena: hashedPassword,
             email,
         });
 
@@ -142,7 +150,16 @@ const updateAdministrador = async (req, res) => {
             });
         }
 
-        await administrador.update(req.body);
+        const updateData = { ...req.body };
+        
+        // Si se está actualizando la contraseña, hashearla
+        if (updateData.contrasena) {
+            const bcrypt = require('bcryptjs');
+            const saltRounds = 10;
+            updateData.contrasena = await bcrypt.hash(updateData.contrasena, saltRounds);
+        }
+
+        await administrador.update(updateData);
 
         res.json({
             success: true,

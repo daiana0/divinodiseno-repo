@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Box, Typography, Card, CardMedia, CardContent } from "@mui/material";
 
 function Categoria() {
   const [categorias, setCategorias] = useState([]);
@@ -7,10 +8,7 @@ function Categoria() {
   useEffect(() => {
     const getCategorias = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3000/api/categorias"
-        );
-
+        const response = await axios.get("http://localhost:3000/api/categorias");
         setCategorias(response.data.data);
       } catch (error) {
         console.error("Error fetching categorias:", error);
@@ -20,21 +18,39 @@ function Categoria() {
   }, []);
 
   return (
-    <div>
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+        gap: 3,
+        p: 3,
+      }}
+    >
       {categorias.length === 0 ? (
-        <p>No hay categorías para mostrar</p>
+        <Typography>No hay categorías para mostrar</Typography>
       ) : (
         categorias.map((categoria) => (
-          <div key={categoria.id}>
-            <h3>{categoria.nombre}</h3>
+          <Card key={categoria.id} sx={{ maxWidth: 250, margin: "auto" }}>
             {categoria.imagenUrl && (
-              <img src={categoria.imagenUrl} alt={categoria.nombre} />
+              <CardMedia
+                component="img"
+                height="150"
+                image={categoria.imagenUrl}
+                alt={categoria.nombre}
+                sx={{ objectFit: "cover" }} // ajusta la imagen sin deformar
+              />
             )}
-          </div>
+            <CardContent>
+              <Typography variant="h6" align="center">
+                {categoria.nombre}
+              </Typography>
+            </CardContent>
+          </Card>
         ))
       )}
-    </div>
+    </Box>
   );
 }
 
 export default Categoria;
+

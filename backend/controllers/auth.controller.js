@@ -67,10 +67,27 @@ exports.login = async (req, res, next) => {
       return res.status(401).json({ success: false, message: "Credenciales incorrectas" });
     }
 
-    // Verificar contraseña
-    const isMatch = await bcrypt.compare(password, usuario.contrasena);
+    // Verificar contraseña - manejar casos donde no esté hasheada
+    let isMatch = false;
+    
+    if (usuario.contrasena) {
+      // Intentar comparar con bcrypt primero
+      try {
+        isMatch = await bcrypt.compare(password, usuario.contrasena);
+      } catch (error) {
+        // Si falla bcrypt, comparar directamente (para contraseñas no hasheadas)
+        isMatch = password === usuario.contrasena;
+      }
+    }
+    
     if (!isMatch) {
       return res.status(401).json({ success: false, message: "Credenciales incorrectas" });
+    }
+
+    // Si es administrador y la contraseña no está hasheada, hashearla
+    if (tipo === "administrador" && password === usuario.contrasena) {
+      const hashedPassword = await bcrypt.hash(password, saltBcrypt);
+      await usuario.update({ contrasena: hashedPassword });
     }
 
     // Generar tokens
