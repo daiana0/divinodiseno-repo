@@ -12,13 +12,18 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { useState } from "react";
 import { useAuth } from "../contexts/Auth.context";
+import { useCart } from "../contexts/Cart.context";
 import LoginModal from "./LoginModal";
+import CartModal from "./CartModal";
+import { Badge } from "@mui/material";
 import logo1 from "../assets/logo1.jpg";
 
 const Header = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [cartModalOpen, setCartModalOpen] = useState(false);
   const { user, logout, isAuthenticated } = useAuth();
+  const { getTotalItems } = useCart();
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -61,8 +66,10 @@ const Header = () => {
             </Box>
 
             <Box sx={{ display: "flex", alignItems: "center", ml: 2 }}>
-              <IconButton color="inherit">
+              <IconButton color="inherit" onClick={() => setCartModalOpen(true)}>
+                <Badge badgeContent={getTotalItems()} color="error">
                 <ShoppingCartIcon />
+                </Badge>
               </IconButton>
               
               {isAuthenticated ? (
@@ -99,6 +106,11 @@ const Header = () => {
       <LoginModal 
         open={loginModalOpen} 
         onClose={() => setLoginModalOpen(false)} 
+      />
+      
+      <CartModal 
+        open={cartModalOpen} 
+        onClose={() => setCartModalOpen(false)} 
       />
     </>
   );

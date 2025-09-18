@@ -9,9 +9,11 @@ import Box from "@mui/material/Box";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { CuponContext } from "../contexts/Cupon.context";
+import { useCart } from "../contexts/Cart.context";
 
 const ProductCard = ({ producto, votos }) => {
   const { cupon } = useContext(CuponContext);
+  const { addToCart, isInCart, getItemQuantity } = useCart();
   const navigate = useNavigate();
 
   const tieneOferta = producto.oferta;
@@ -29,6 +31,13 @@ const ProductCard = ({ producto, votos }) => {
   // 4. Saber si hay descuento
   const tieneDescuentoAplicado = mejorDescuento > 0;
 
+  const handleAddToCart = (e) => {
+    e.stopPropagation(); // Evitar que se navegue al detalle del producto
+    addToCart(producto);
+  };
+
+  const productInCart = isInCart(producto.id);
+  const quantity = getItemQuantity(producto.id);
   return (
     <Card
       onClick={() => navigate(`/producto/${producto.id}`)}
@@ -120,8 +129,13 @@ const ProductCard = ({ producto, votos }) => {
       </CardContent>
 
       <CardActions sx={{ display: "flex", justifyContent: "center", pt: 2 }}>
-        <Button size="small" variant="contained" color="secondary">
-          Comprar
+        <Button 
+          size="small" 
+          variant="contained" 
+          color={productInCart ? "success" : "secondary"}
+          onClick={handleAddToCart}
+        >
+          {productInCart ? `En carrito (${quantity})` : "Agregar al carrito"}
         </Button>
       </CardActions>
     </Card>

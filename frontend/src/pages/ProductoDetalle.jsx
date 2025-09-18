@@ -6,6 +6,7 @@ import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { CuponContext } from "../contexts/Cupon.context";
+import { useCart } from "../contexts/Cart.context";
 
 const ProductoDetalle = () => {
   const { id } = useParams();
@@ -13,7 +14,8 @@ const ProductoDetalle = () => {
   const [mensajes, setMensajes] = useState([]);
   const [nuevoMensaje, setNuevoMensaje] = useState("");
   const [variantes, setVariantes] = useState([]);
-  const { cupon } = useContext(CuponContext); // 👈 agregamos cupon context
+  const { cupon } = useContext(CuponContext);
+  const { addToCart, removeFromCart, isInCart, getItemQuantity } = useCart();
 
   useEffect(() => {
     axios
@@ -72,6 +74,16 @@ const ProductoDetalle = () => {
   const precioFinal = producto.precio - (producto.precio * mejorDescuento) / 100;
   const tieneDescuentoAplicado = mejorDescuento > 0;
 
+  const productInCart = isInCart(producto.id);
+  const quantity = getItemQuantity(producto.id);
+
+  const handleAddToCart = () => {
+    addToCart(producto);
+  };
+
+  const handleRemoveFromCart = () => {
+    removeFromCart(producto.id);
+  };
   return (
     <Box sx={{ p: 3, backgroundColor: "white" }}>
       <Typography variant="h4" gutterBottom>
@@ -97,6 +109,33 @@ const ProductoDetalle = () => {
           ${producto.precio.toFixed(2)}
         </Typography>
       )}
+
+      {/* Botones de carrito */}
+      <Box sx={{ mt: 3, display: 'flex', gap: 2, alignItems: 'center' }}>
+        <Button 
+          variant="contained" 
+          color="primary" 
+          onClick={handleAddToCart}
+          size="large"
+        >
+          Agregar al carrito
+        </Button>
+        
+        {productInCart && (
+          <>
+            <Typography variant="body1">
+              En carrito: {quantity} unidades
+            </Typography>
+            <Button 
+              variant="outlined" 
+              color="error" 
+              onClick={handleRemoveFromCart}
+            >
+              Eliminar del carrito
+            </Button>
+          </>
+        )}
+      </Box>
 
       {/* Variantes */}
       <Box sx={{ mt: 4 }}>
