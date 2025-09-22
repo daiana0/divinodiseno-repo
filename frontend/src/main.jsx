@@ -5,15 +5,18 @@ import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
 import { CuponProviderWrapper } from "./contexts/Cupon.context.jsx";
 import { AuthProvider } from "./contexts/Auth.context.jsx";
+import { CartProvider } from "./contexts/Cart.context.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <AuthProvider>
-      <CuponProviderWrapper>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </CuponProviderWrapper>
+      <CartProvider>
+        <CuponProviderWrapper>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </CuponProviderWrapper>
+      </CartProvider>
     </AuthProvider>
   </StrictMode>
 );
